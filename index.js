@@ -3,21 +3,21 @@ const fg = require('fast-glob');
 const parser = require('@babel/parser');
 const traverse = require('@babel/traverse').default;
 const glob = process.argv.slice(2);
-let filename;
 
 async function main() {
     const files = await fg(glob);
     const functionMap = new Map();
-    files.forEach(file => {
+    files.forEach(file => { // first iteration, collect all function declaration, export declaration, etc
         const code = fs.readFileSync(file, 'utf8');
         const ast = parser.parse(code, {sourceType: 'module', plugins: ['jsx']});
         traverse(ast, {
             VariableDeclaration: function (path) {
                 path.node.declarations.forEach(declaration => {
                     const declarationType = declaration.init?.type;
-                    if (declarationType === 'FunctionExpression' || declarationType === 'ArrowFunctionExpression') {
+                    if (declarationType === 'FunctionExpression' ||
+                        declarationType === 'ArrowFunctionExpression') {
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, {imports: [], count: 0});
+                        functionMap.set(functionName, { count: 0});
                     }
                 });
 
@@ -26,34 +26,35 @@ async function main() {
                 if (!declaration) {
                     return;
                 }
-                if (declaration.type === 'FunctionDeclaration') {
+                if (declaration.type === 'FunctionDeclaration') { // case when function has name
                     if (declaration.id?.name) {
                         const functionName = declaration.id.name;
                         functionMap.set(functionName, {imports: [], count: 0});
                     }
 
-                    const fileNameStart = file.lastIndexOf('/');
+                    const fileNameStart = file.lastIndexOf('/'); // when anonymous fn
                     const fileName = file.slice(fileNameStart + 1)
-                    functionMap.set(fileName, {imports: [], count: 0});
+                    functionMap.set(fileName, {count: 0});
                 }
-            }, ExportNamedDeclaration: function (path, state) {
+            }, ExportNamedDeclaration: function (path) {
                 const declaration = path.node.declaration;
                 if (!declaration) {
                     return;
                 }
                 if (declaration.type === 'FunctionDeclaration') {
                     const functionName = declaration.id.name;
-                    functionMap.set(functionName, {imports: [], count: 0});
+                    functionMap.set(functionName, { count: 0});
                 }
                 if (declaration.type === 'VariableDeclaration') {
                     declaration.declarations.forEach(declaration => {
 
                         if (declaration.type === 'VariableDeclarator') {
 
-                            if (declaration.init && (declaration.init.type === 'FunctionExpression' || declaration.init.type === 'ArrowFunctionExpression' || declaration.init.type === 'CallExpression')) {
+                            if (declaration.init && (declaration.init.type === 'FunctionExpression' ||
+                                declaration.init.type === 'ArrowFunctionExpression' ||
+                                declaration.init.type === 'CallExpression')) { // when variable is created like const Foo = bar(); Possibly, a fn
                                 const functionName = declaration.id.name;
                                 functionMap.set(functionName, {
-                                    imports: [],
                                     count: 0,
                                     filename: declaration.id.loc.filename
                                 });
@@ -65,7 +66,7 @@ async function main() {
                 }
                 // if (declaration.type === 'ClassDeclaration') {
                 //     const functionName = declaration.id.name;
-                //     functionMap.set(functionName, { imports: [], count: 0 });
+                //     functionMap.set(functionName, { count: 0 });
                 // }
             }
         })
@@ -82,7 +83,8 @@ async function main() {
                         functionMap.get(functionName).count++;
                     }
                 }
-            }, VariableDeclaration: function (path) {
+            },
+            VariableDeclaration: function (path) {
                 path.node.declarations.forEach(declaration => {
                     const declarationType = declaration.init?.type;
                     if (declarationType === 'CallExpression') {
@@ -101,28 +103,20 @@ async function main() {
             }, JSXElement: function (path) {
                 if (path.node.openingElement.name.type === 'JSXIdentifier') {
                     const functionName = path.node.openingElement.name.name
-                    // eslint-disable-next-line no-console
-                    // console.log(path.node.openingElement.name.name, 'path.node.openingElement.name');
+
                     try {
                         functionMap.get(functionName).count++;
-                    } catch (e) {
-                        // eslint-disable-next-line no-console
-                        // console.log(functionName, 'functionNameerrr');
-                    }
-
+                    } catch (e) {}
 
                 }
             },
-            ImportDeclaration(path){
+            ImportDeclaration(path){ // for default exports/imports
                 path.node.specifiers.forEach(specifier=>{
                     if(specifier.type==='ImportDefaultSpecifier'){
-                        // eslint-disable-next-line no-console
-                        // console.log( path.node.source, ' path.node.source');
                         const fileNameStart = path.node.source.value.lastIndexOf('/');
                         const fileName = path.node.source.value.slice(fileNameStart + 1)+'.js'
                     if (functionMap.has(fileName))
                         functionMap.get(fileName).count++;
-
                     }
                 })
             }
