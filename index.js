@@ -17,7 +17,8 @@ async function main() {
                     if (declarationType === 'FunctionExpression' ||
                         declarationType === 'ArrowFunctionExpression') {
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, { count: 0});
+                        functionMap.set(functionName, { count: 0,
+                        path:file});
                     }
                 });
 
@@ -29,7 +30,8 @@ async function main() {
                 if (declaration.type === 'FunctionDeclaration') { // case when function has name
                     if (declaration.id?.name) {
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, {imports: [], count: 0});
+                        functionMap.set(functionName, {imports: [], count: 0,
+                        path:file});
                     }
 
                     const fileNameStart = file.lastIndexOf('/'); // when anonymous fn
@@ -43,7 +45,8 @@ async function main() {
                 }
                 if (declaration.type === 'FunctionDeclaration') {
                     const functionName = declaration.id.name;
-                    functionMap.set(functionName, { count: 0});
+                    functionMap.set(functionName, { count: 0,
+                    path:file});
                 }
                 if (declaration.type === 'VariableDeclaration') {
                     declaration.declarations.forEach(declaration => {
@@ -56,7 +59,8 @@ async function main() {
                                 const functionName = declaration.id.name;
                                 functionMap.set(functionName, {
                                     count: 0,
-                                    filename: declaration.id.loc.filename
+                                    filename: declaration.id.loc.filename,
+                                    path:file
                                 });
                             }
 
@@ -77,6 +81,10 @@ async function main() {
         const ast = parser.parse(code, {sourceType: 'module', plugins: ['jsx']});
         traverse(ast, {
             CallExpression: function (path) {
+                // if function is used in .test file - skip (make it optional with flag)
+                if(file.indexOf('.test')!==-1){
+                    return;
+                }
                 if (path.node.callee.type === 'Identifier') {
                     const functionName = path.node.callee.name;
                     if (functionMap.has(functionName)) {
@@ -85,6 +93,10 @@ async function main() {
                 }
             },
             VariableDeclaration: function (path) {
+                // if function is used in .test file - skip (make it optional with flag)
+                if(file.indexOf('.test')!==-1){
+                    return;
+                }
                 path.node.declarations.forEach(declaration => {
                     const declarationType = declaration.init?.type;
                     if (declarationType === 'CallExpression') {
@@ -101,6 +113,10 @@ async function main() {
                     }
                 })
             }, JSXElement: function (path) {
+                // if function is used in .test file - skip (make it optional with flag)
+                if(file.indexOf('.test')!==-1){
+                    return;
+                }
                 if (path.node.openingElement.name.type === 'JSXIdentifier') {
                     const functionName = path.node.openingElement.name.name
 
