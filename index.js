@@ -17,8 +17,12 @@ async function main() {
                     if (declarationType === 'FunctionExpression' ||
                         declarationType === 'ArrowFunctionExpression') {
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, { count: 0,
-                        path:file});
+                        if(!functionMap.has(functionName)){
+                            functionMap.set(functionName, { count: 0,
+                                path:new Set([file])});
+                            return;
+                        }
+                        functionMap.get(functionName).path.add(file);
                     }
                 });
 
@@ -30,13 +34,22 @@ async function main() {
                 if (declaration.type === 'FunctionDeclaration') { // case when function has name
                     if (declaration.id?.name) {
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, {imports: [], count: 0,
-                        path:file});
+                        if(!functionMap.has(functionName)){
+                            functionMap.set(functionName, { count: 0,
+                                path:new Set([file])});
+                            return;
+                        }
+                        functionMap.get(functionName).path.add(file);
                     }
 
                     const fileNameStart = file.lastIndexOf('/'); // when anonymous fn
                     const fileName = file.slice(fileNameStart + 1)
-                    functionMap.set(fileName, {count: 0});
+                    if(!functionMap.has(fileName)){
+                        functionMap.set(fileName, { count: 0,
+                            path:new Set([file])});
+                        return;
+                    }
+                    functionMap.get(fileName).path.add(file);
                 }
             }, ExportNamedDeclaration: function (path) {
                 const declaration = path.node.declaration;
@@ -45,8 +58,12 @@ async function main() {
                 }
                 if (declaration.type === 'FunctionDeclaration') {
                     const functionName = declaration.id.name;
-                    functionMap.set(functionName, { count: 0,
-                    path:file});
+                    if(!functionMap.has(functionName)){
+                        functionMap.set(functionName, { count: 0,
+                            path:new Set([file])});
+                        return;
+                    }
+                    functionMap.get(functionName).path.add(file);
                 }
                 if (declaration.type === 'VariableDeclaration') {
                     declaration.declarations.forEach(declaration => {
@@ -57,11 +74,12 @@ async function main() {
                                 declaration.init.type === 'ArrowFunctionExpression' ||
                                 declaration.init.type === 'CallExpression')) { // when variable is created like const Foo = bar(); Possibly, a fn
                                 const functionName = declaration.id.name;
-                                functionMap.set(functionName, {
-                                    count: 0,
-                                    filename: declaration.id.loc.filename,
-                                    path:file
-                                });
+                                if(!functionMap.has(functionName)){
+                                    functionMap.set(functionName, { count: 0,
+                                        path:new Set([file])});
+                                    return;
+                                }
+                                functionMap.get(functionName).path.add(file);
                             }
 
                         }
@@ -109,7 +127,10 @@ async function main() {
                             }
                         })
                         const functionName = declaration.id.name;
-                        functionMap.set(functionName, {imports: [], count: 0});
+                        if (functionMap.has(functionName)){
+
+                        functionMap.get(functionName).count++;
+                        }
                     }
                 })
             }, JSXElement: function (path) {
@@ -139,7 +160,7 @@ async function main() {
         })
     })
     const sortedArray = Array.from(functionMap).sort((a, b) => b[1].count - a[1].count)
-        .filter(el => el[1].count > 5);
+        .filter(el => el[1].count >= 5);
 
     console.log(new Map(sortedArray), 'functionMap');
 }
