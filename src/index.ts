@@ -1,21 +1,23 @@
 import fs from 'fs';
 import fg from 'fast-glob';
-import parser from '@babel/parser';
+import {parse} from '@babel/parser';
 import traverse from '@babel/traverse';
 const glob = process.argv.slice(2);
 
 async function main() {
     const files = await fg(glob);
     const functionMap = new Map();
+    
     files.forEach(file => { // first iteration, collect all function declaration, export declaration, etc
-        const code = fs.readFileSync(file, 'utf8');
-        const ast = parser.parse(code, {sourceType: 'module', plugins: ['jsx']});
+        const code = fs.readFileSync(file, 'utf8');        
+        const ast = parse(code, {sourceType: 'module', plugins: ['jsx']});
         traverse(ast, {
             VariableDeclaration: function (path) {
                 path.node.declarations.forEach(declaration => {
                     const declarationType = declaration.init?.type;
                     if (declarationType === 'FunctionExpression' ||
                         declarationType === 'ArrowFunctionExpression') {
+                        // @ts-ignore
                         const functionName = declaration.id.name;
                         if(!functionMap.has(functionName)){
                             functionMap.set(functionName, { count: 0,
@@ -53,14 +55,17 @@ async function main() {
                 }
             }, ExportNamedDeclaration: function (path) {
                 const declaration = path.node.declaration;
+                
                 if (!declaration) {
                     return;
                 }
                 if (declaration.type === 'FunctionDeclaration') {
-                    const functionName = declaration.id.name;
+                    
+                    // @ts-ignore
+                    const functionName = declaration.id.name;                    
                     if(!functionMap.has(functionName)){
                         functionMap.set(functionName, { count: 0,
-                            path:new Set([file])});
+                            path:new Set([file])});                            
                         return;
                     }
                     functionMap.get(functionName).path.add(file);
@@ -73,6 +78,7 @@ async function main() {
                             if (declaration.init && (declaration.init.type === 'FunctionExpression' ||
                                 declaration.init.type === 'ArrowFunctionExpression' ||
                                 declaration.init.type === 'CallExpression')) { // when variable is created like const Foo = bar(); Possibly, a fn
+                                // @ts-ignore
                                 const functionName = declaration.id.name;
                                 if(!functionMap.has(functionName)){
                                     functionMap.set(functionName, { count: 0,
@@ -96,7 +102,7 @@ async function main() {
 
     files.forEach(file => {
         const code = fs.readFileSync(file, 'utf8');
-        const ast = parser.parse(code, {sourceType: 'module', plugins: ['jsx']});
+        const ast = parse(code, {sourceType: 'module', plugins: ['jsx']});
         traverse(ast, {
             CallExpression: function (path) {
                 // if function is used in .test file - skip (make it optional with flag)
@@ -120,12 +126,15 @@ async function main() {
                     if (declarationType === 'CallExpression') {
                         const argumentsOfFn = declaration.init.arguments;
                         argumentsOfFn.forEach(argument => {
+                            // @ts-ignore
                             if (argument.name && functionMap.has(argument.name)) {
+                                // @ts-ignore
                                 const functionName = argument.name
                                 functionMap.get(functionName).count++;
 
                             }
                         })
+                        // @ts-ignore
                         const functionName = declaration.id.name;
                         if (functionMap.has(functionName)){
 
@@ -160,7 +169,7 @@ async function main() {
         })
     })
     const sortedArray = Array.from(functionMap).sort((a, b) => b[1].count - a[1].count)
-        .filter(el => el[1].count >= 5);
+        .filter(el => el[1].count >= 0);
 
     console.log(new Map(sortedArray), 'functionMap');
 }

@@ -1,11 +1,14 @@
 {
   "name": "rate-usages",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build":"tsc & cp src/index.js dist/index.js",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "bin": {
+    "rateUsages": "bin/index.js"
   },
   "keywords": [],
   "author": "",
@@ -17,9 +20,14 @@
     "fast-glob": "^3.2.12"
   },
   "devDependencies": {
+    "@babel/core": "^7.21.4",
+    "@babel/preset-env": "^7.21.4",
     "@types/babel__traverse": "^7.18.3",
-    "@types/babel-traverse": "^6.25.7",
     "@types/node": "^18.15.11",
-    "typescript": "^5.0.4"
+    "babel-loader": "^9.1.2",
+    "ts-loader": "^9.4.2",
+    "typescript": "^5.0.4",
+    "webpack": "^5.79.0",
+    "webpack-cli": "^5.0.1"
   }
 }
