@@ -1,7 +1,7 @@
 {
   "name": "rate-usages",
-  "version": "0.1.0",
-  "description": "",
+  "version": "0.1.1",
+  "description": "Collects usage number of every function in code and sort the list by number of usages",
   "main": "index.js",
   "scripts": {
     "build": "webpack",
@@ -10,8 +10,9 @@
   "bin": {
     "rateUsages": "bin/index.js"
   },
-  "keywords": [],
-  "author": "",
+  "repository": "https://github.com/VVS232/top-used-functions",
+  "keywords": ["usages","number of usages"],
+  "author": "Vladyslav Soldatenko",
   "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.21.4",

@@ -171,7 +171,7 @@ async function main() {
     const sortedArray = Array.from(functionMap).sort((a, b) => b[1].count - a[1].count)
         .filter(el => el[1].count >= 0);
 
-    console.log(new Map(sortedArray), 'functionMap');
+    console.log(new Map(sortedArray));
 }
 
 main()
