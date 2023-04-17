@@ -2,36 +2,24 @@ import fs from 'fs';
 import fg from 'fast-glob';
 import {parse} from '@babel/parser';
 import traverse from '@babel/traverse';
-import yargs from 'yargs/yargs';
-import { hideBin } from 'yargs/helpers';
-const argv = yargs(hideBin(process.argv)).options({
-    "min-usages": {
-        alias: 'm',
-        default:1,
-        description: 'Filter function with usages min than the passed value',
-        type:'number'
-    },
-    "ignore-test-files":{
-        default:false,
-        type:"boolean",
-        descrtiption:"don't count function invocation in .test.js files"
-    }
-}).parseSync();
-// @ts-ignore
-const glob = String(argv._[0]);
 
-async function main() {    
-if(!fg.isDynamicPattern(glob)){
-    console.log(`Incorrect glob was passed. Please pass a glob as an argument. 
-        For more info please refer to https://github.com/mrmlnc/fast-glob`);
-    return;
-}
+
+export default async function countUsages(glob:string,
+    {minUsages=1,
+    ignoreTestFiles=false
+}: {minUsages?:number,ignoreTestFiles?:boolean}) {  
+
+    if(!fg.isDynamicPattern(glob)){
+        console.log(`Incorrect glob was passed. Please pass a glob as an argument. 
+            For more info please refer to https://github.com/mrmlnc/fast-glob`);
+        return;
+    }
 
     const files = await fg(glob);
     const functionMap = new Map();
 
-    const minUsagesToShow = !isNaN(argv.minUsages) ? argv.minUsages : 1;
-    const shouldIgnoreTestFiles = argv.ignoreTestFiles;
+    const minUsagesToShow = !isNaN(minUsages) ? minUsages : 1;
+    const shouldIgnoreTestFiles = ignoreTestFiles;
     
     files.forEach(file => { // first iteration, collect all function declaration, export declaration, etc
         const code = fs.readFileSync(file, 'utf8');        
@@ -196,4 +184,3 @@ if(!fg.isDynamicPattern(glob)){
     console.log(new Map(sortedArray));
 }
 
-main()

@@ -2,10 +2,11 @@
   "name": "rate-usages",
   "version": "0.1.3",
   "description": "Collects usage number of every function in code and sort the list by number of usages",
-  "main": "index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "dev":"webpack --watch",
-    "build": "webpack",
+    "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
@@ -16,6 +17,10 @@
     "usages",
     "number of usages"
   ],
+  "files": [
+    "/dist",
+    "/bin"
+  ]
   "author": "Vladyslav Soldatenko",
   "license": "MIT",
   "dependencies": {
