@@ -20,7 +20,7 @@
   "files": [
     "/dist",
     "/bin"
-  ]
+  ],
   "author": "Vladyslav Soldatenko",
   "license": "MIT",
   "dependencies": {
