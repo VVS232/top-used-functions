@@ -1,12 +1,12 @@
 {
   "name": "rate-usages",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Collects usage number of every function in code and sort the list by number of usages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
     "dev":"webpack --watch",
-    "build": "tsc",
+    "build": "webpack & tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "bin": {
