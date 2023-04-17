@@ -181,6 +181,6 @@ export default async function countUsages(glob:string,
     const sortedArray = Array.from(functionMap).sort((a, b) => b[1].count - a[1].count)
         .filter(el => el[1].count >= minUsagesToShow);
 
-    console.log(new Map(sortedArray));
+    return new Map(sortedArray);
 }
 

@@ -1,6 +1,6 @@
 {
   "name": "rate-usages",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "Collects usage number of every function in code and sort the list by number of usages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

@@ -6,6 +6,10 @@ This utility is goes takes glob as input (currently glob shoud end with ".js" ex
 # Usage
 npx rate-usages glob <br>  <br>
 (npx rate-usages ./my-code-here/**/*.js -- please use forward shashes)
+<br> OR <br>
+import rateUsages from "rate-usages"; || const rateUsages = require("rate-usages").default;
+
+const result = await rateUsages(glob, {...options})
 
 # Options
 **--min-usages** | **-m** (number): don't show functions with usage count <= passed value. Default: 1.<br>

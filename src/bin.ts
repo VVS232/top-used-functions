@@ -16,4 +16,4 @@ const argv = yargs(hideBin(process.argv)).options({
 }).parseSync();
 const glob = String(argv._[0]);
 
-countUsages(glob,argv);
+countUsages(glob,argv).then(console.log);
