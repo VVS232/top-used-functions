@@ -7,12 +7,13 @@ This utility is goes takes glob as input (currently glob shoud end with ".js" ex
 npx rate-usages glob <br>  <br>
 (npx rate-usages ./my-code-here/**/*.js -- please use forward shashes)
 
+# Options
+**--min-usages** | **-m** (number): don't show functions with usage count <= passed value. Default: 1.
+
 # Example output
 { <br>
-  'a' => { count: 1, path: Set(1) { './test-resources/a.js' } }, <br>
-  'b3' => { count: 1, path: Set(1) { './test-resources/b.js' } }, <br>
-  'b1' => { count: 0, path: Set(1) { './test-resources/b.js' } }, <br>
-  'b2' => { count: 0, path: Set(1) { './test-resources/b.js' } } <br>
+  'a' => { count: 2, path: Set(1) { './my-code-here/a.js' } }, <br>
+  'b' => { count: 1, path: Set(1) { './my-code-here/b.js' } }, <br>
 } 
 
 Any issues and PRs are welcome. This is extra alfa version, so if you find the idea useful and have any improvement in mind - go ahead and tell me.

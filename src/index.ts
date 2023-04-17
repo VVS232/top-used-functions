@@ -2,11 +2,31 @@ import fs from 'fs';
 import fg from 'fast-glob';
 import {parse} from '@babel/parser';
 import traverse from '@babel/traverse';
-const glob = process.argv.slice(2);
+import yargs from 'yargs/yargs';
+import { hideBin } from 'yargs/helpers';
+const argv = yargs(hideBin(process.argv)).options({
+    "min-usages": {
+        alias: 'm',
+        default:1,
+        description: 'filter function with usages min than the passed value',
+        type:'number'
+    }
+}).parseSync();
+// @ts-ignore
+const glob = String(argv._[0]);
 
-async function main() {
+async function main() {    
+if(!fg.isDynamicPattern(glob)){
+    console.log(`Incorrect glob was passed. Please pass a glob as an argument. 
+    For more info please refer to https://github.com/mrmlnc/fast-glob`);
+    return;
+}
+
     const files = await fg(glob);
     const functionMap = new Map();
+
+    const minUsagesToShow = !isNaN(argv.minUsages) ? argv.minUsages : 1;
+
     
     files.forEach(file => { // first iteration, collect all function declaration, export declaration, etc
         const code = fs.readFileSync(file, 'utf8');        
@@ -169,7 +189,7 @@ async function main() {
         })
     })
     const sortedArray = Array.from(functionMap).sort((a, b) => b[1].count - a[1].count)
-        .filter(el => el[1].count >= 0);
+        .filter(el => el[1].count >= minUsagesToShow);
 
     console.log(new Map(sortedArray));
 }

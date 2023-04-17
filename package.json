@@ -4,6 +4,7 @@
   "description": "Collects usage number of every function in code and sort the list by number of usages",
   "main": "index.js",
   "scripts": {
+    "dev":"webpack --watch",
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,20 +12,25 @@
     "rateUsages": "bin/index.js"
   },
   "repository": "https://github.com/VVS232/top-used-functions",
-  "keywords": ["usages","number of usages"],
+  "keywords": [
+    "usages",
+    "number of usages"
+  ],
   "author": "Vladyslav Soldatenko",
   "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.21.4",
     "@babel/plugin-syntax-jsx": "^7.21.4",
     "@babel/traverse": "^7.21.4",
-    "fast-glob": "^3.2.12"
+    "fast-glob": "^3.2.12",
+    "yargs": "^17.7.1"
   },
   "devDependencies": {
     "@babel/core": "^7.21.4",
     "@babel/preset-env": "^7.21.4",
     "@types/babel__traverse": "^7.18.3",
     "@types/node": "^18.15.11",
+    "@types/yargs": "^17.0.24",
     "babel-loader": "^9.1.2",
     "ts-loader": "^9.4.2",
     "typescript": "^5.0.4",
