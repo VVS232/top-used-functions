@@ -8,7 +8,8 @@ npx rate-usages glob <br>  <br>
 (npx rate-usages ./my-code-here/**/*.js -- please use forward shashes)
 
 # Options
-**--min-usages** | **-m** (number): don't show functions with usage count <= passed value. Default: 1.
+**--min-usages** | **-m** (number): don't show functions with usage count <= passed value. Default: 1.<br>
+**--ignore-test-files** (boolean): Don't count function invocations in .test.js files. Default: false.
 
 # Example output
 { <br>

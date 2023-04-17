@@ -8,8 +8,13 @@ const argv = yargs(hideBin(process.argv)).options({
     "min-usages": {
         alias: 'm',
         default:1,
-        description: 'filter function with usages min than the passed value',
+        description: 'Filter function with usages min than the passed value',
         type:'number'
+    },
+    "ignore-test-files":{
+        default:false,
+        type:"boolean",
+        descrtiption:"don't count function invocation in .test.js files"
     }
 }).parseSync();
 // @ts-ignore
@@ -18,7 +23,7 @@ const glob = String(argv._[0]);
 async function main() {    
 if(!fg.isDynamicPattern(glob)){
     console.log(`Incorrect glob was passed. Please pass a glob as an argument. 
-    For more info please refer to https://github.com/mrmlnc/fast-glob`);
+        For more info please refer to https://github.com/mrmlnc/fast-glob`);
     return;
 }
 
@@ -26,7 +31,7 @@ if(!fg.isDynamicPattern(glob)){
     const functionMap = new Map();
 
     const minUsagesToShow = !isNaN(argv.minUsages) ? argv.minUsages : 1;
-
+    const shouldIgnoreTestFiles = argv.ignoreTestFiles;
     
     files.forEach(file => { // first iteration, collect all function declaration, export declaration, etc
         const code = fs.readFileSync(file, 'utf8');        
@@ -125,8 +130,7 @@ if(!fg.isDynamicPattern(glob)){
         const ast = parse(code, {sourceType: 'module', plugins: ['jsx']});
         traverse(ast, {
             CallExpression: function (path) {
-                // if function is used in .test file - skip (make it optional with flag)
-                if(file.indexOf('.test')!==-1){
+                if(shouldIgnoreTestFiles && file.indexOf('.test')!==-1){
                     return;
                 }
                 if (path.node.callee.type === 'Identifier') {
@@ -137,8 +141,7 @@ if(!fg.isDynamicPattern(glob)){
                 }
             },
             VariableDeclaration: function (path) {
-                // if function is used in .test file - skip (make it optional with flag)
-                if(file.indexOf('.test')!==-1){
+                if(shouldIgnoreTestFiles && file.indexOf('.test')!==-1){
                     return;
                 }
                 path.node.declarations.forEach(declaration => {
@@ -163,8 +166,7 @@ if(!fg.isDynamicPattern(glob)){
                     }
                 })
             }, JSXElement: function (path) {
-                // if function is used in .test file - skip (make it optional with flag)
-                if(file.indexOf('.test')!==-1){
+                if(shouldIgnoreTestFiles && file.indexOf('.test')!==-1){
                     return;
                 }
                 if (path.node.openingElement.name.type === 'JSXIdentifier') {

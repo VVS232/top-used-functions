@@ -4,7 +4,6 @@ const  webpack =require( 'webpack');
 module.exports = {
   entry: './src/index.ts',
   mode: 'production',
-  devtool: 'source-map',
   module: {
     rules: [
       {
