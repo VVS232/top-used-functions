@@ -1,6 +1,6 @@
 {
   "name": "rate-usages",
-  "version": "0.1.6",
+  "version": "0.1.7",
   "description": "Collects usage number of every function in code and sort the list by number of usages",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,7 @@
   "bin": {
     "rateUsages": "bin/index.js"
   },
-  "repository": "https://github.com/VVS232/top-used-functions",
+  "repository": "https://github.com/Vladyslav-Soldatenko/top-used-functions",
   "keywords": [
     "usages",
     "number of usages"
