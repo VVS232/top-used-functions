@@ -12,7 +12,7 @@
   "bin": {
     "rateUsages": "bin/index.js"
   },
-  "repository": "https://github.com/VVS232/top-used-functions",
+  "repository": "https://github.com/Vladyslav-Soldatenko/top-used-functions",
   "keywords": [
     "usages",
     "number of usages"
